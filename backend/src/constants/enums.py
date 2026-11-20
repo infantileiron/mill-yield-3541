@@ -9,4 +9,10 @@ class ReviewStatus(str,Enum):
     completed="completed"
     approved="approved"
     failed="failed"
+class DisclosureStatus(str,Enum):
+    pending="pending"
+    judging="judging"
+    rejected="rejected"
+    published="published"
+    failed="failed"
 LINES=["一线","二线","三线"]

@@ -2,3 +2,16 @@
 -- This migration documents the business keys used for idempotent demo seed.
 -- batches.code UNIQUE; inspections.sample_code UNIQUE; users.email UNIQUE.
 -- reviews stores immutable JSON snapshots, result checksum and approver identity.
+--
+-- Outbound disclosure review additions:
+-- frozen_batch_means.batch_id UNIQUE -> one immutable frozen mean per batch,
+--   keyed by the arrival month (month_key = received_date[:7]); means are
+--   frozen on the first accepted application of the month and never rewritten.
+-- disclosure_applications.ledger_key UNIQUE (nullable) -> a publication is
+--   posted at most once per application; NULLs are allowed while pending, so
+--   multiple applications can coexist before judging.  Retries reuse the same
+--   row and ledger key, so a failed posting can never create a second release.
+-- disclosure_applications.status carries pending/judging/rejected/published/failed.
+-- solvable_batches (JSON) and reject_reason are internal-only; the API masks
+--   them for non-admin callers, and published sums are never serialized before
+--   publication.

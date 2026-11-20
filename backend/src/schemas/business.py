@@ -26,3 +26,13 @@ class ReviewInput(BaseModel):
     line:Literal["全部","一线","二线","三线"]="全部"
 class ApprovalInput(BaseModel):
     note:str=Field(min_length=5,max_length=1500)
+class DisclosureInput(BaseModel):
+    batch_ids:list[int]=Field(min_length=1)
+    @field_validator('batch_ids')
+    @classmethod
+    def unique_positive(cls,v):
+        if any(not isinstance(x,int) or x<=0 for x in v):
+            raise ValueError('批次编号必须为正整数')
+        if len(v)!=len(set(v)):
+            raise ValueError('所选批次存在重复，请去重后再提交')
+        return v

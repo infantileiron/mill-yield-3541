@@ -36,6 +36,31 @@ class Review(Base):
     created_by:Mapped[str]=mapped_column(String(100))
     approved_by:Mapped[str]=mapped_column(String(100),default="")
     created_at:Mapped[datetime]=mapped_column(DateTime(timezone=True),default=lambda:datetime.now(timezone.utc))
+class FrozenBatchMean(Base):
+    __tablename__="frozen_batch_means"
+    id:Mapped[int]=mapped_column(primary_key=True)
+    batch_id:Mapped[int]=mapped_column(ForeignKey("batches.id"),unique=True)
+    month_key:Mapped[str]=mapped_column(String(7),index=True)
+    mean_value:Mapped[float]=mapped_column(Float)
+    sample_count:Mapped[int]=mapped_column(Integer)
+    checksum:Mapped[str]=mapped_column(String(64))
+    created_at:Mapped[datetime]=mapped_column(DateTime(timezone=True),default=lambda:datetime.now(timezone.utc))
+class DisclosureApplication(Base):
+    __tablename__="disclosure_applications"
+    id:Mapped[int]=mapped_column(primary_key=True)
+    month_key:Mapped[str]=mapped_column(String(7),index=True)
+    batch_ids:Mapped[list]=mapped_column(JSON,default=list)
+    batch_codes:Mapped[list]=mapped_column(JSON,default=list)
+    status:Mapped[str]=mapped_column(String(20),default="pending",index=True)
+    requested_sum:Mapped[float]=mapped_column(Float,nullable=True)
+    published_sum:Mapped[float]=mapped_column(Float,nullable=True)
+    reject_reason:Mapped[str]=mapped_column(Text,default="")
+    solvable_batches:Mapped[list]=mapped_column(JSON,default=list)
+    ledger_key:Mapped[str]=mapped_column(String(80),unique=True,nullable=True)
+    attempts:Mapped[int]=mapped_column(Integer,default=0)
+    created_by:Mapped[str]=mapped_column(String(100))
+    created_at:Mapped[datetime]=mapped_column(DateTime(timezone=True),default=lambda:datetime.now(timezone.utc))
+    judged_at:Mapped[datetime]=mapped_column(DateTime(timezone=True),nullable=True)
 class Audit(Base):
     __tablename__="audits"
     id:Mapped[int]=mapped_column(primary_key=True)

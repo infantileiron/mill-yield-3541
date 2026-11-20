@@ -11,3 +11,12 @@ def export_review(obj):
     out={r['sample_code'] for r in obj.result['outliers']}
     for row in obj.snapshot:w.writerow([row['sample_code'],row['batch_code'],row['line'],row['flour_yield'],row['moisture'],'是' if row['sample_code'] in out else '否'])
     return Response('﻿'+output.getvalue(),media_type='text/csv; charset=utf-8',headers={'Content-Disposition':f'attachment; filename="mill-yield-review-{obj.id}.csv"'})
+def export_disclosures(apps):
+    # Public export: only approved sums and the batch codes they cover.
+    # No single-batch means, no month/application identifiers, no rejected or
+    # pending rows, and no internal reasons leave the system.
+    output=io.StringIO();w=csv.writer(output)
+    w.writerow(['获准公布的出粉率均值加总值(%)','所含批号'])
+    for app in apps:
+        w.writerow([f'{app.published_sum:.4f}',';'.join(app.batch_codes)])
+    return Response('﻿'+output.getvalue(),media_type='text/csv; charset=utf-8',headers={'Content-Disposition':'attachment; filename="mill-disclosure-published.csv"'})
